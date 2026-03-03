@@ -15,24 +15,29 @@
 ## Operational Requirements
 1. log when user log in when user visit the hash/secret url
 
-## System Components
+## Storages
 ### Message Storage
-1. Supports fast append operation, message are frequently being written
-1. Supports time range query so that user can easily see the message with another user in decendent time order
+A wide column db sort data physically using timestamp such as cassandra is ideal, but hard to host. Hence choosing MongoDB Atlas as the first implementation, and index it using timestamp.
+
+*Shema*
+todo
 
 ### User Storage
-1. keep it minimal, save the id and name first
+A document based nosql can support fast lookup and less frequent writes. Choosing MongoDB Atlas as the hosing platform.
 
-### Message Queue
-1. Planning to use a message queue as the way to handle offline scenario
+*Shema*
+todo
 
-### Chat Protocol
+### Conversation Storage
+A wide column nosql would be a good fit because it requires heavy read (everytime user login) and heavy write (everytime user sends message). Cassandra or ScyllaDB would be a good choice but former requires self-host, and the latter has no generous free tier. Hence still choose MongoDB Atls as the hosting platform
+
+*Shema*
+todo
+
+## Chat Protocol
 1. Use websocket to implement real-time chat
 
-## FLows
-### Message send flow
-1. Alice send message to Bob
-  1. Alice 
+### Chat FLows
 ═══════════════════════════════════════════════════════════════════════════════════
   ALICE SENDS "hi bob" TO BOB
 ═══════════════════════════════════════════════════════════════════════════════════
@@ -97,16 +102,17 @@
 
     rx.recv() ──→ ws_sender.send() ──→ out to browser
 
-## FLows
-### Message send flow
-1. User send two request, one websocket request to the receipient, one to the message queue.
-1. Would it be wasteful to send the same message in two different ways?
-1. Message queue will later save the message to message storage
-## Implementation Steps
-1. decide which storage to store users
-1. users able to connect to websocket server
-1. decide how to store message between two users
-1. the storing should support fast lookup and sort by time, so that user can easily see the history chat with another user
-1. chat message storage should be optimized for appending operation, as new message are written frequently
-1. send message method take an user id and message content
-1. when two users are online, both should be able to see the message sent to them
+## Milesstones
+1. Users are able to connect to the websocket server
+1. Users are able to send message to the websocket server
+1. Server is able to send message to recipient websocket client
+1. store and fetch conversations for the logged in user
+1. user can see the previous message with a given user
+1. terminal UI
+
+## Notes
+1. decided to use MongoDB Atlas for 1) user information, 2) conversations, 3) messages
+
+## Next
+* Which db to store user information?
+* Which db to store messages

@@ -12,27 +12,44 @@
 1. indicate if receipient is online or not based on detection result
 1. chat can send images, will store the image using object_store_rust service (https://github.com/hotlatteiceamericano/object_store_rust)
 
-## Operational Requirements
+## System Requirements
+1. Separate HTTP and WebSocket server, so that they can scale independently
+1. WebSocket server are communicated through a Redis Pub/Sub, for cross server communications
 1. log when user log in when user visit the hash/secret url
 
+## Connection Lookup
+It is important for this project to scale up websocket server easily. That we can decrease or increase the number of websocket server to reduce cost or to accomodate with increasing usages.
+
+It results different users may have their websocket connections on different server, making us to implement a cross-server communication method. Redis Pub/Sub is chosen because, we don't need persistent storage on message sending. We allow messages to not be sent to the client, and client should be notified when such happened and choose to resend or not.
+
+To start with single server implementation, we should abstract the connection lookup in a trait and choose in-server implementation or cross-server implementation.
+
 ## Storages
-### Message Storage
-A wide column db sort data physically using timestamp such as cassandra is ideal, but hard to host. Hence choosing MongoDB Atlas as the first implementation, and index it using timestamp.
-
-*Shema*
-todo
-
 ### User Storage
 A document based nosql can support fast lookup and less frequent writes. Choosing MongoDB Atlas as the hosing platform.
 
 *Shema*
-todo
+id: 
+display_name: String
+server_id: String
+
+### Message Storage
+A wide column db sort data physically using timestamp such as cassandra is ideal, but it is hard to host. Hence choosing MongoDB Atlas as the first implementation, and index it using timestamp.
+
+*Shema*
+sender: User
+receiver: User
+content: String
+msg_type: message type enum
+timestamp: 
 
 ### Conversation Storage
 A wide column nosql would be a good fit because it requires heavy read (everytime user login) and heavy write (everytime user sends message). Cassandra or ScyllaDB would be a good choice but former requires self-host, and the latter has no generous free tier. Hence still choose MongoDB Atls as the hosting platform
 
 *Shema*
-todo
+sender: User
+receiver: User
+last_message: Message
 
 ## Chat Protocol
 1. Use websocket to implement real-time chat
@@ -89,18 +106,6 @@ todo
   8.   │    ←── ws_sender.send() ←──│       │             │            │        ┊        │
        │ "hey alice"        │               │             │            │        ┊        │
 
-
-═══════════════════════════════════════════════════════════════════════════════════
-  EACH USER'S TWO TASKS (same structure for everyone)
-═══════════════════════════════════════════════════════════════════════════════════
-
-  Task 1 (read from this user, route to others):
-
-    ws_receiver ──→ parse recipient ──→ store in db ──→ recipient_tx.send()
-
-  Task 2 (receive from others, write to this user):
-
-    rx.recv() ──→ ws_sender.send() ──→ out to browser
 
 ## Milesstones
 1. Users are able to connect to the websocket server

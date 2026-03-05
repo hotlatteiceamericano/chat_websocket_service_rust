@@ -1,7 +1,8 @@
 # Chat Service WebSocket Service
 ## Fcuntionality
-1. log in by entering user id and will provide a hash/secret url for use to log in. this url shall later be only sent to the registered email address
-1. connect to the chat service through a visit of a url
+1. user to register with an email
+1. log in to a separate http server by entering a cli command and provide the login email, system will send verificaion number via email and waiting for user to enter the verificaiton number in the command line
+1. http server validates, denies when not matched, forward to this websocket server when matches, with user informations
 1. http request to list chat history about which receipients were chatted before
 1. http request when provide receipient id would like to chat with
 1. return the chat history between you and the receipient
@@ -39,8 +40,8 @@ A wide column db sort data physically using timestamp such as cassandra is ideal
 *Shema*
 sender: User
 receiver: User
-content: String
-msg_type: message type enum
+payload: Option<Vec<u64>>
+msg_type: message type enum, including image, text and a type indicating user is typing
 timestamp: 
 
 ### Conversation Storage

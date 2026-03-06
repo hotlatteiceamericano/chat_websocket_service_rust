@@ -1,8 +1,8 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 use axum::{Router, routing::get};
 use chat_websocket_service_rust::{app_state::AppState, handler::ws_handler};
-use futures::lock::Mutex;
+use dashmap::DashMap;
 
 #[tokio::main]
 async fn main() {
@@ -11,7 +11,7 @@ async fn main() {
     // websocket handler should be looking up the connection using user id
     // keep in mind that the connection lookup will be start with in-server
     // and later become cross-server using Redis Pub/Sub
-    let state = AppState::new(Arc::new(Mutex::new(HashMap::new())));
+    let state = AppState::new(Arc::new(DashMap::new()));
     let app = Router::new()
         .route("/ws", get(ws_handler::ws_handler))
         .with_state(state);

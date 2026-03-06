@@ -1,13 +1,19 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct Message {
-    // sender_id: u32,
-    // receiver_id: u32,
+    pub sender_id: u32,
+    pub receiver_id: u32,
     // todo: update to Vec<u32>
-    payload: String,
+    pub payload: String,
     // msg_type: MessageType
 }
 
-impl From<String> for Message {
-    fn from(value: String) -> Self {
-        Self { payload: value }
-    }
-}
+// impl From<&str> for Message {
+//     fn from(value: &str) -> Self {
+//         let json = serde_json::Deserializer::from(value);
+//         Self {
+//             payload: String::from(value),
+//         }
+//     }
+// }

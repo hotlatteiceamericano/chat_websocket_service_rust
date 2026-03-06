@@ -66,7 +66,7 @@ last_message: Message
        │          ┊         │               │             │            │        ┊        │
   1.   │── "hi bob" ──→     │               │             │            │        ┊        │
        │          ┊         │               │             │            │        ┊        │
-  2.   │          ┊   Task 1 reads it       │             │            │        ┊        │
+  2.   │          ┊   Sender Task reads it  │             │            │        ┊        │
        │          ┊         │               │             │            │        ┊        │
   3.   │          ┊   store in database     │             │            │        ┊        │
        │          ┊         │               │             │            │        ┊        │
@@ -76,7 +76,7 @@ last_message: Message
        │          ┊         │               │             │            │        ┊        │
   6.   │          ┊         │               │         rx.recv()        │        ┊        │
        │          ┊         │               │             │            │        ┊        │
-  7.   │          ┊         │               │       Task 2 reads it    │        ┊        │
+  7.   │          ┊         │               │       Receiver Task reads it      │        ┊        │
        │          ┊         │               │             │            │        ┊        │
   8.   │          ┊         │               │             │──→ ws_sender.send() ──→      │
        │          ┊         │               │             │            │        ┊  "hi bob"

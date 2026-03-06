@@ -1,14 +1,17 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
-use futures::{channel::mpsc::UnboundedSender, lock::Mutex};
+use dashmap::DashMap;
+use futures::channel::mpsc::UnboundedSender;
+
+use crate::message::Message;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub map: Arc<Mutex<HashMap<u32, UnboundedSender<String>>>>,
+    pub map: Arc<DashMap<u32, UnboundedSender<Message>>>,
 }
 
 impl AppState {
-    pub fn new(map: Arc<Mutex<HashMap<u32, UnboundedSender<String>>>>) -> Self {
+    pub fn new(map: Arc<DashMap<u32, UnboundedSender<Message>>>) -> Self {
         Self { map }
     }
 }

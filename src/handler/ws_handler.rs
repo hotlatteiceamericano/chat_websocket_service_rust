@@ -40,9 +40,16 @@ async fn handle_upgrade(ws: WebSocket, app_state: AppState, user_id: u32) {
     let keys: Vec<u32> = app_state.map.iter().map(|e| *e.key()).collect();
     println!("current connection: {:#?}", keys);
 
-    tokio::spawn(handle_msg_send(ws_receiver, app_state.clone()));
+    let send_handle = tokio::spawn(handle_msg_send(ws_receiver, app_state.clone()));
 
-    tokio::spawn(handle_msg_receive(rx, ws_sender));
+    let receive_handle = tokio::spawn(handle_msg_receive(rx, ws_sender));
+
+    tokio::select! {
+        _ = send_handle => {println!("sender task ended!")},
+        _ = receive_handle => {println!("receiver task ended!")},
+    }
+
+    app_state.map.remove(&user_id);
 }
 
 /// Sender Task

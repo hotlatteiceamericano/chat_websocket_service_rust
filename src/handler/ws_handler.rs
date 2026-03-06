@@ -77,9 +77,9 @@ async fn handle_upgrade(ws: WebSocket, app_state: AppState, user_id: u32) {
     // ws_sender to send the message to receiver
     // store the tx in the map
     tokio::spawn(async move {
-        while let Some(k) = rx.next().await {
+        while let Some(message) = rx.next().await {
             ws_sender
-                .send(WebSocketMessage::Text(k.payload.into()))
+                .send(WebSocketMessage::Text(message.into()))
                 .await
                 .expect("unable to send message to the websocket receipient");
         }

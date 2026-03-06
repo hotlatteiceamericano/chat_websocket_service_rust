@@ -1,3 +1,4 @@
+use axum::extract::ws::Utf8Bytes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -9,11 +10,9 @@ pub struct Message {
     // msg_type: MessageType
 }
 
-// impl From<&str> for Message {
-//     fn from(value: &str) -> Self {
-//         let json = serde_json::Deserializer::from(value);
-//         Self {
-//             payload: String::from(value),
-//         }
-//     }
-// }
+impl Into<Utf8Bytes> for Message {
+    fn into(self) -> Utf8Bytes {
+        let json = serde_json::to_string(&self).expect("unable to serialize a Message to json");
+        json.into()
+    }
+}

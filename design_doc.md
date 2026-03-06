@@ -2,7 +2,8 @@
 ## Fcuntionality
 1. user to register with an email
 1. log in to a separate http server by entering a cli command and provide the login email, system will send verificaion number via email and waiting for user to enter the verificaiton number in the command line
-1. http server validates, denies when not matched, forward to this websocket server when matches, with user informations
+1. http server validates, denies when not matched, return JWT token when matched
+1. client connect to websocket with the token
 1. http request to list chat history about which receipients were chatted before
 1. http request when provide receipient id would like to chat with
 1. return the chat history between you and the receipient

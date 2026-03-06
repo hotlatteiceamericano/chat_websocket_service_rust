@@ -61,11 +61,12 @@ async fn handle_msg_send(mut ws_receiver: SplitStream<WebSocket>, app_state: App
             WebSocketMessage::Text(text) => {
                 let message: Message = serde_json::from_str(text.as_str())
                     .expect("receiving text is not in valid Message json format");
-                let receiver_id = message.receiver_id;
-                let Some(receiver_tx) = app_state.map.get(&receiver_id) else {
-                    println!("did not find user with user id: {}", receiver_id);
+
+                let Some(receiver_tx) = app_state.map.get(&message.receiver_id) else {
+                    println!("did not find user with user id: {}", &message.receiver_id);
                     break;
                 };
+
                 receiver_tx
                     .unbounded_send(message)
                     .expect("failed to send message to user id: {}");

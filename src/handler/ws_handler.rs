@@ -1,4 +1,8 @@
-use crate::{app_state::AppState, message::Message};
+use crate::{
+    app_state::AppState,
+    handler::msg_handler::{self, MessageHandleError},
+    message::Message,
+};
 use axum::{
     extract::{
         State, WebSocketUpgrade,
@@ -57,27 +61,25 @@ async fn handle_upgrade(ws: WebSocket, app_state: AppState, user_id: u32) {
 /// finds receiver's tx to send message to receiver
 async fn handle_msg_send(mut ws_receiver: SplitStream<WebSocket>, app_state: AppState) {
     while let Some(Ok(msg)) = ws_receiver.next().await {
-        match msg {
-            WebSocketMessage::Text(text) => {
-                let message: Message = serde_json::from_str(text.as_str())
-                    .expect("receiving text is not in valid Message json format");
+        let result = match msg {
+            WebSocketMessage::Text(text) => msg_handler::handle_text(&text, &app_state),
+            WebSocketMessage::Binary(binary) => msg_handler::handle_binary(&binary, &app_state),
+            _ => {
+                println!("websocket received message with unsupported type, dropping");
+                continue;
+            }
+        };
 
-                let Some(receiver_tx) = app_state.map.get(&message.receiver_id) else {
-                    println!("did not find user with user id: {}", &message.receiver_id);
-                    break;
-                };
-
-                receiver_tx
-                    .unbounded_send(message)
-                    .expect("failed to send message to user id: {}");
+        if let Err(e) = result {
+            match e {
+                MessageHandleError::ReceiverNotFound { id } => {
+                    println!("receiver id: {} not found, dropping the message", id);
+                }
+                MessageHandleError::InvalidMessageFormat { error } => {
+                    println!("received message is in invalid format, err: {:?}", error);
+                }
+                _ => println!("unsupported error type when sending message to websocket receiver."),
             }
-            WebSocketMessage::Binary(_binary) => {
-                println!("received binary message")
-            }
-            WebSocketMessage::Close(_) => {
-                break;
-            }
-            _ => {}
         }
     }
 }
@@ -91,9 +93,10 @@ async fn handle_msg_receive(
     mut ws_sender: SplitSink<WebSocket, WebSocketMessage>,
 ) {
     while let Some(message) = rx.next().await {
-        ws_sender
-            .send(WebSocketMessage::Text(message.into()))
-            .await
-            .expect("unable to send message to the websocket receipient");
+        let text = serde_json::to_string(&message).unwrap();
+        if let Err(e) = ws_sender.send(WebSocketMessage::Text(text.into())).await {
+            println!("unable to send message to the websocket recipient: {}", e);
+            break;
+        }
     }
 }

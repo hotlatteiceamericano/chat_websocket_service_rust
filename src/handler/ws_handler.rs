@@ -23,11 +23,11 @@ pub async fn ws_handler(
     ws: WebSocketUpgrade,
 ) -> Response {
     let user_id = headers
-        .get("user_id")
+        .get("User-Id")
         .and_then(|v| v.to_str().ok())
         .and_then(|s| s.parse::<u32>().ok());
     let Some(id) = user_id else {
-        return StatusCode::NOT_FOUND.into_response();
+        return StatusCode::BAD_REQUEST.into_response();
     };
 
     ws.on_upgrade(move |ws| self::handle_upgrade(ws, state, id))
@@ -61,6 +61,7 @@ async fn handle_upgrade(ws: WebSocket, app_state: AppState, user_id: u32) {
 /// finds receiver's tx to send message to receiver
 async fn handle_msg_send(mut ws_receiver: SplitStream<WebSocket>, app_state: AppState) {
     while let Some(Ok(msg)) = ws_receiver.next().await {
+        println!("received messages from client");
         let result = match msg {
             WebSocketMessage::Text(text) => msg_handler::handle_text(&text, &app_state),
             WebSocketMessage::Binary(binary) => msg_handler::handle_binary(&binary, &app_state),

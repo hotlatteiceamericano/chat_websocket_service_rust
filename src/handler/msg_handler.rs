@@ -6,7 +6,7 @@ use thiserror::Error;
 use crate::{app_state::AppState, message::Message};
 
 pub fn handle_text(text: &Utf8Bytes, app_state: &AppState) -> Result<(), MessageHandleError> {
-    let message: Message = serde_json::from_str(text.as_str())?;
+    let message: Message = Message::try_from(text)?;
 
     let receiver_tx =
         app_state

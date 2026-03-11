@@ -1,6 +1,8 @@
 use axum::extract::ws::Utf8Bytes;
 use serde::{Deserialize, Serialize};
 
+use crate::handler::msg_handler::MessageHandleError;
+
 #[derive(Serialize, Deserialize)]
 pub struct Message {
     pub sender_id: u32,
@@ -10,9 +12,11 @@ pub struct Message {
     // msg_type: MessageType
 }
 
-impl Into<Utf8Bytes> for Message {
-    fn into(self) -> Utf8Bytes {
-        let json = serde_json::to_string(&self).expect("unable to serialize a Message to json");
-        json.into()
+impl TryFrom<&Utf8Bytes> for Message {
+    type Error = MessageHandleError;
+
+    fn try_from(value: &Utf8Bytes) -> Result<Self, Self::Error> {
+        serde_json::from_str(value.as_str())
+            .map_err(|e| MessageHandleError::InvalidMessageFormat { error: e })
     }
 }

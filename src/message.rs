@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::handler::msg_handler::MessageHandleError;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Message {
     pub sender_id: u32,
     pub receiver_id: u32,

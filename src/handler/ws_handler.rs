@@ -1,7 +1,6 @@
 use crate::{
     app_state::AppState,
-    handler::msg_handler::{self, MessageHandleError},
-    message::Message,
+    handler::msg_handler::{self},
 };
 use axum::{
     extract::{
@@ -11,6 +10,7 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
+use chat_common::{message::Message, message_handle_error::MessageHandleError};
 use futures::{
     SinkExt, StreamExt,
     channel::mpsc::{self, UnboundedReceiver},

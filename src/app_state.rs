@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
+use chat_common::message::Message;
 use dashmap::DashMap;
 use futures::channel::mpsc::UnboundedSender;
-
-use crate::message::Message;
 
 #[derive(Clone)]
 pub struct AppState {

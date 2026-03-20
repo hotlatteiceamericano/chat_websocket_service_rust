@@ -201,6 +201,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "chat_common"
+version = "0.1.0"
+source = "git+https://github.com/hotlatteiceamericano/chat_common#f2828092a8be6a0ed4c577396587e538cf6055bb"
+dependencies = [
+ "axum",
+ "futures",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "chat_websocket_service_rust"
 version = "0.1.0"
 dependencies = [
@@ -208,6 +220,7 @@ dependencies = [
  "axum",
  "axum-test",
  "bincode",
+ "chat_common",
  "dashmap",
  "futures",
  "rstest",

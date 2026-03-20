@@ -1,9 +1,8 @@
 use anyhow::Result;
 use axum::{body::Bytes, extract::ws::Utf8Bytes};
-use futures::channel::mpsc::TrySendError;
-use thiserror::Error;
+use chat_common::{message::Message, message_handle_error::MessageHandleError};
 
-use crate::{app_state::AppState, message::Message};
+use crate::app_state::AppState;
 
 pub fn handle_text(text: &Utf8Bytes, app_state: &AppState) -> Result<(), MessageHandleError> {
     let message: Message = Message::try_from(text)?;
@@ -25,31 +24,12 @@ pub fn handle_binary(_binary: &Bytes, _app_state: &AppState) -> Result<(), Messa
     Ok(())
 }
 
-/// Custom error to conclude three different types of error
-/// from distinct crates into this enum
-/// It uses thiserror's derive helpers to implement
-/// Error trait (for anyhow)
-/// and From<T> trait (convert to MessageHandleError)
-#[derive(Debug, Error)]
-pub enum MessageHandleError {
-    #[error("user id not found: {id}")]
-    ReceiverNotFound { id: u32 },
-
-    #[error("invalid message format")]
-    InvalidMessageFormat {
-        #[from]
-        error: serde_json::Error,
-    },
-
-    #[error("error when sending messages to receiver's transimitter")]
-    MPSC(#[from] TrySendError<Message>),
-}
-
 #[cfg(test)]
 pub mod test {
     use std::sync::Arc;
 
     use axum::extract::ws::Utf8Bytes;
+    use chat_common::message::Message;
     use dashmap::DashMap;
     use futures::channel::mpsc::{self, UnboundedReceiver, UnboundedSender};
     use rstest::{fixture, rstest};
@@ -57,7 +37,6 @@ pub mod test {
     use crate::{
         app_state::AppState,
         handler::msg_handler::{self, MessageHandleError},
-        message::Message,
     };
 
     // receiver needs to be returned so that it can live until the test run

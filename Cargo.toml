@@ -13,6 +13,7 @@ bincode = {version = "1.3"}
 anyhow = "1.0.102"
 dashmap = "6.1.0"
 thiserror = "2.0"
+chat_common = {git="https://github.com/hotlatteiceamericano/chat_common"}
 
 [dev-dependencies]
 axum-test = { version = "19.1.1", features = ["ws"] }

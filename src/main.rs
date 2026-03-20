@@ -16,7 +16,7 @@ async fn main() {
     let state = AppState::new(Arc::new(DashMap::new()));
     let app = Router::new()
         .route("/ws", get(ws_handler::ws_handler))
-        .layer(from_fn_with_state(state.clone(), auth))
+        // .layer(from_fn_with_state(state.clone(), auth))
         .with_state(state);
     let listner = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     println!("websocket server starts");

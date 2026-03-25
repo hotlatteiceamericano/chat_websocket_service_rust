@@ -13,7 +13,7 @@ pub async fn auth(State(_state): State<AppState>, request: Request, next: Next) 
         .get("Authorization")
         .and_then(|h| h.to_str().ok())
     else {
-        println!("missing Authorization from the request");
+        tracing::error!("missing Authorization from the request");
         return StatusCode::UNAUTHORIZED.into_response();
     };
 

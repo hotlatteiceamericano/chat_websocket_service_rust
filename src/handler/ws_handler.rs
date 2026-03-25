@@ -40,9 +40,9 @@ async fn handle_upgrade(ws: WebSocket, app_state: AppState, user_id: u32) {
     let (tx, rx) = mpsc::unbounded::<Message>();
 
     app_state.map.insert(user_id, tx);
-    println!("user id {} connected", user_id);
+    tracing::info!("user id {} connected", user_id);
     let keys: Vec<u32> = app_state.map.iter().map(|e| *e.key()).collect();
-    println!("current connection: {:#?}", keys);
+    tracing::info!("current connection: {:#?}", keys);
 
     let send_handle = tokio::spawn(handle_msg_send(ws_receiver, app_state.clone()));
 

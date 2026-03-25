@@ -1,18 +1,10 @@
 # Chat Service WebSocket Service
 ## Fcuntionality
-1. user to register with an email
-1. log in to a separate http server by entering a cli command and provide the login email, system will send verificaion number via email and waiting for user to enter the verificaiton number in the command line
-1. http server validates, denies when not matched, return JWT token when matched
-1. client connect to websocket with the token
-1. http request to list chat history about which receipients were chatted before
-1. http request when provide receipient id would like to chat with
-1. return the chat history between you and the receipient
-1. send the message through a real time message queue (inbox)
-1. if recepient is online, recepient consume its inbox
-1. if receipien is offline, store the message until it come back online
-1. service keeps detecting if sender or receipient are still online
-1. indicate if receipient is online or not based on detection result
-1. chat can send images, will store the image using object_store_rust service (https://github.com/hotlatteiceamericano/object_store_rust)
+1. client connect to websocket server using the websocket url, and the JWT token provided by HTTP server.
+1. when received message from the clients, send this message to Redis Pub/Sub.
+1. subscribe to the Redis Pub/Sub, and consume message:
+  1. if recepient is online, recepient consume its inbox
+  1. if receipien is offline, store the message to permanent storage
 
 ## System Requirements
 1. Separate HTTP and WebSocket server, so that they can scale independently
@@ -57,6 +49,7 @@ last_message: Message
 1. Use websocket to implement real-time chat
 
 ### Chat FLows
+* spawning two tasks for sending messages and receiving messages respectively. so that they don't block each other
 ═══════════════════════════════════════════════════════════════════════════════════
   ALICE SENDS "hi bob" TO BOB
 ═══════════════════════════════════════════════════════════════════════════════════
@@ -109,17 +102,22 @@ last_message: Message
        │ "hey alice"        │               │             │            │        ┊        │
 
 
+## Deployment
+To-research, can I deployt WebSocket server and HTTP server altogether using Docker?
+
 ## Milesstones
-1. Users are able to connect to the websocket server
-1. Users are able to send message to the websocket server
-1. Server is able to send message to recipient websocket client
-1. store and fetch conversations for the logged in user
-1. user can see the previous message with a given user
-1. terminal UI
+[x]. Users are able to connect to the websocket server
+[x]. Users are able to send message to the websocket server
+[x]. Server is able to send message to recipient websocket client
+[]. terminal UI to connect to the websocket server
+[]. terminal UI can send and receive messages
+[]. store and fetch conversations for the logged in user
+[]. user can see the previous message with a given user
 
 ## Notes
 1. decided to use MongoDB Atlas for 1) user information, 2) conversations, 3) messages
 
-## Next
-* Which db to store user information?
-* Which db to store messages
+## Future Phases
+1. User's online/active indicator
+1. User's typing or not
+1. Send images and store images using object_store_rust service (https://github.com/hotlatteiceamericano/object_store_rust)

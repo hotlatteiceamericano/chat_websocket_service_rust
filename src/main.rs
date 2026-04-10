@@ -26,7 +26,7 @@ async fn main() {
         .route("/ws", get(ws_handler::ws_handler))
         .layer(from_fn_with_state(state.clone(), auth))
         .with_state(state);
-    let listner = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listner = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
 
     tracing::info!("websocket server starts");
     axum::serve(listner, app).await.unwrap();

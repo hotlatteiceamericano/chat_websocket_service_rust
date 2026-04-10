@@ -16,7 +16,7 @@ thiserror = "2.0"
 chat_common = {git="https://github.com/hotlatteiceamericano/chat_common"}
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
-jsonwebtoken = "10.3.0"
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 
 [dev-dependencies]
 axum-test = { version = "19.1.1", features = ["ws"] }

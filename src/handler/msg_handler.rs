@@ -45,7 +45,7 @@ pub mod test {
         let map: DashMap<u32, UnboundedSender<Message>> = DashMap::new();
         let (tx, rx) = mpsc::unbounded::<Message>();
         map.insert(1, tx);
-        (AppState::new(Arc::new(map)), rx)
+        (AppState::new(Arc::new(map), String::from("")), rx)
     }
 
     #[fixture]
